@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import MarketDataTable from "./MarketDataTable";
 import { formatNumber } from "../utils/numbers";
-
+import Box from "@mui/material/Box";
 const isJSON = (data) => {
   try {
     JSON.parse(data);
@@ -119,10 +119,10 @@ const Market30Data = ({ switchValue }) => {
   };
 
   return (
-    <div className="market-data-container">
+    <Box className="market-data-container">
       <h2>All Stocks Market Data</h2>
       <MarketDataTable data={formatData()} />
-    </div>
+    </Box>
   );
 };
 

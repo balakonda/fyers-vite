@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { NIFTY_200_LIST, amountList } from "./components/data";
-import Market30Data from "./components/all-market-30-data";
-import SelectedMarket30Data from "./components/selected-market-30-data";
+import { NIFTY_200_LIST, amountList } from "../components/data";
+import Market30Data from "../components/all-market-30-data";
+import SelectedMarket30Data from "../components/selected-market-30-data";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -16,9 +16,11 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { formatNumber } from "./utils/numbers";
+import { formatNumber } from "../utils/numbers";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import CalculatedData from "./components/calculated-data";
+import CalculatedData from "../components/calculated-data";
+import Box from "@mui/material/Box";
+import BottomNavigation from "@mui/material/BottomNavigation";
 
 const STOCK_LIST = NIFTY_200_LIST.slice(0, 10).map((symbol) => `NSE:${symbol}-EQ`);
 
@@ -29,6 +31,7 @@ export default function Market() {
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [switchValue, setSwitchValue] = useState(30);
   const [amount, setAmount] = useState(30000000);
+  const [value, setValue] = useState(0);
 
   const getAllMarketData = async () => {
     const response = await fetch("http://localhost:5000/api/get-all-market-30-data");
@@ -72,7 +75,9 @@ export default function Market() {
   }, []);
 
   return (
-    <>
+    <Box>
+      
+      
       <Accordion>
         <AccordionSummary>
           <Typography variant="p">Market Data</Typography>
@@ -124,7 +129,7 @@ export default function Market() {
             </Card>
               </Stack>
         </AccordionDetails>
-      </Accordion>
+        </Accordion>
       <Stack direction="row" spacing={2} >
         {showAllMarketData && <Market30Data switchValue={switchValue} />}
         {showSelectedMarketData && <SelectedMarket30Data selectedSymbols={selectedSymbols} />}
@@ -132,6 +137,6 @@ export default function Market() {
       </Stack>
       {/* {showAllMarketData && <AllMarketData />} */}
       {/* {showSelectedMarketData && <SelectedMarketData selectedSymbols={selectedSymbols} />} */}
-    </>
+    </Box>
   );
 }

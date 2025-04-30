@@ -57,8 +57,8 @@ const MarketDataTable = ({ data }) => {
   return (
     <Stack direction="column" spacing={2} alignItems="center">
       <Filters handleBlurAmountChange={handleBlurAmountChange} isAmountChecked={isAmountChecked} handleAmountChecked={handleAmountChecked} />
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650, maxHeight: 400 }} size="small" aria-label="market data table" stickyHeader>
+      <TableContainer component={Paper} sx={{  maxHeight: 400, }}>
+        <Table  size="small" aria-label="market data table" stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Symbol</TableCell>
@@ -73,7 +73,7 @@ const MarketDataTable = ({ data }) => {
               <TableCell align="right">Last Traded Time</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody sx={{ overflow: 'auto', maxHeight: 400 }}>
+          <TableBody >
             {filteredData.map((row) => (
               <TableRow key={row.key} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell component="th" scope="row">
