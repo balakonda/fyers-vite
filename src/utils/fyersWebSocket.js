@@ -2,7 +2,7 @@
 import { fyersDataSocket } from "fyers-web-sdk-v3";
 import { NIFTY_200_LIST } from "../components/data";
 const accessToken = localStorage.getItem("access_token");
-const clientId = process.env.NEXT_PUBLIC_FYERS_APP_ID; // Replace with your client ID
+const clientId = import.meta.env.VITE_FYERS_APP_ID; // Replace with your client ID
 const symbol = "NSE:DMART-EQ";
 let fyersWS;
 

@@ -15,10 +15,10 @@ export default defineConfig({
   },
   define: {
     "process.env": {
-      VITE_FYERS_CLIENT_ID: JSON.stringify(process.env.VITE_FYERS_CLIENT_ID),
-      VITE_FYERS_APP_SECRET: JSON.stringify(process.env.VITE_FYERS_APP_SECRET),
-      VITE_FYERS_REDIRECT_URL: JSON.stringify(process.env.VITE_FYERS_REDIRECT_URI),
-      VITE_FYERS_APP_ID: JSON.stringify(process.env.VITE_FYERS_SCOPE),
+      VITE_FYERS_CLIENT_ID: JSON.stringify(import.meta.env.VITE_FYERS_CLIENT_ID),
+      VITE_FYERS_APP_SECRET: JSON.stringify(import.meta.env.VITE_FYERS_APP_SECRET),
+      VITE_FYERS_REDIRECT_URL: JSON.stringify(import.meta.env.VITE_FYERS_REDIRECT_URI),
+      VITE_FYERS_APP_ID: JSON.stringify(import.meta.env.VITE_FYERS_SCOPE),
     },
   },
 });

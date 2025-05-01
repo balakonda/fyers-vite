@@ -1,10 +1,9 @@
-"use client";
 import { fyersModel } from "fyers-web-sdk-v3";
 
 const fyers = new fyersModel();
 
-fyers.setAppId(process.env.NEXT_PUBLIC_FYERS_APP_ID);
-fyers.setRedirectUrl(process.env.NEXT_PUBLIC_FYERS_REDIRECT_URL);
+fyers.setAppId(import.meta.env.VITE_FYERS_APP_ID);
+fyers.setRedirectUrl(import.meta.env.VITE_FYERS_REDIRECT_URL);
 
 let profileData = localStorage.getItem("profile");
 const accessToken = localStorage.getItem("access_token");

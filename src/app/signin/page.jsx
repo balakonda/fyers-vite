@@ -4,8 +4,10 @@ import { useEffect } from "react";
 
 export default function Signin() {
   const fyers = new fyersModel();
-  fyers.setAppId(process.env.VITE_FYERS_CLIENT_ID);
-  fyers.setRedirectUrl(process.env.VITE_FYERS_REDIRECT_URL);
+  console.log(import.meta.env.VITE_FYERS_CLIENT_ID);
+  console.log(import.meta.env.VITE_FYERS_CLIENT_ID);
+  fyers.setAppId(import.meta.env.VITE_FYERS_CLIENT_ID);
+  fyers.setRedirectUrl(import.meta.env.VITE_FYERS_CLIENT_ID);
 
   var generateAuthcodeURL = fyers.generateAuthCode();
   console.log(generateAuthcodeURL);

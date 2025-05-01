@@ -63,8 +63,8 @@ export default function InitConnection() {
     const getAccessToken = async () => {
       const response = await fyers.generate_access_token({
         auth_code: authCode,
-        secret_key: process.env.NEXT_PUBLIC_FYERS_APP_SECRET,
-        client_id: process.env.NEXT_PUBLIC_FYERS_CLIENT_ID,
+        secret_key: import.meta.env.VITE_FYERS_APP_SECRET,
+        client_id: import.meta.env.VITE_FYERS_CLIENT_ID,
       });
       console.log(response);
       setAuthResponse(response);
