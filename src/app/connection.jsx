@@ -3,7 +3,6 @@ import React from "react";
 import Accordion from "@mui/material/Accordion";
 import fyers, { setProfile, userProfile } from "../components/getFyersAPI";
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
@@ -50,10 +49,11 @@ export default function InitConnection() {
   const [authResponse, setAuthResponse] = useState(null);
   // http://192.168.137.1:3000/?s=ok&code=200&auth_code=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkubG9naW4uZnllcnMuaW4iLCJpYXQiOjE3NDE0MTU1MzIsImV4cCI6MTc0MTQ0NTUzMiwibmJmIjoxNzQxNDE0OTMyLCJhdWQiOiJbXCJ4OjBcIiwgXCJ4OjFcIiwgXCJ4OjJcIiwgXCJkOjFcIiwgXCJkOjJcIiwgXCJ4OjFcIiwgXCJ4OjBcIl0iLCJzdWIiOiJhdXRoX2NvZGUiLCJkaXNwbGF5X25hbWUiOiJGSDAzNjUiLCJvbXMiOiJLMSIsImhzbV9rZXkiOiI0ODc0ZmEzOTQyYzRhNjg5OWNhMTRhOTFiMWIwOTJiZTU5ZTNjN2YyMzhiMDMyY2M5ODE4N2Q5NSIsImlzRGRwaUVuYWJsZWQiOiJOIiwiaXNNdGZFbmFibGVkIjoiTiIsIm5vbmNlIjoiIiwiYXBwX2lkIjoiS0hCRFRGSEVTWSIsInV1aWQiOiIyNjgwYmMwNjMxN2I0YmQzOWI1OTc5YTFjZjYwZjllNiIsImlwQWRkciI6IjAuMC4wLjAiLCJzY29wZSI6IiJ9.L9mJ4w2EnMHg93J5uUOqgrIMzJ_KBHgzG3vdKiBo1iw&state=sample_state
 
-  const searchParams = useSearchParams();
+  const searchParams = new URLSearchParams(window.location.search);
 
   // console.log(searchParams);
   const authCode = searchParams?.get("auth_code");
+  console.log(authCode);
 
   // console.log(authCode)@
   const profileData = useMemo(() => JSON.parse(localStorage.getItem("profile")), []);

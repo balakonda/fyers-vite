@@ -132,7 +132,7 @@ export default function Market() {
         </Accordion>
       <Stack direction="row" spacing={2} >
         {showAllMarketData && <Market30Data switchValue={switchValue} />}
-        {showSelectedMarketData && <SelectedMarket30Data selectedSymbols={selectedSymbols} />}
+        {/* {showSelectedMarketData && <SelectedMarket30Data selectedSymbols={selectedSymbols} />} */}
           {showCalculatedData && <CalculatedData />}
       </Stack>
       {/* {showAllMarketData && <AllMarketData />} */}

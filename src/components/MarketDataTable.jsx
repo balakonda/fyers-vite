@@ -16,7 +16,7 @@ export const formatNumber = (value) => {
 };
 
 const Filters = ({ handleBlurAmountChange, isAmountChecked, handleAmountChecked }) => {
-  const [amountValue, setAmountValue] = useState(200000);
+  const [amountValue, setAmountValue] = useState(20000000);
 
   const handleAmountChange = (event) => {
     setAmountValue(Number(event.target.value));
@@ -34,7 +34,7 @@ const Filters = ({ handleBlurAmountChange, isAmountChecked, handleAmountChecked 
   );
 };
 const MarketDataTable = ({ data }) => {
-  const [blurAmountValue, setBlurAmountValue] = useState(200000);
+  const [blurAmountValue, setBlurAmountValue] = useState(20000000);
   const [isAmountChecked, setIsAmountChecked] = useState(false);
 
   const handleBlurAmountChange = (amountValue) => {
