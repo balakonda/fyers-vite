@@ -33,7 +33,7 @@ const Filters = ({ handleBlurAmountChange, isAmountChecked, handleAmountChecked 
     </Stack>
   );
 };
-const MarketDataTable = ({ data }) => {
+const MarketDataTable = ({ data, isVolume = false }) => {
   const [blurAmountValue, setBlurAmountValue] = useState(20000000);
   const [isAmountChecked, setIsAmountChecked] = useState(false);
 
@@ -65,6 +65,7 @@ const MarketDataTable = ({ data }) => {
               <TableCell align="right">LTP</TableCell>
               {/* <TableCell align="right">Bid Price</TableCell>
             <TableCell align="right">Ask Price</TableCell> */}
+              {isVolume && <TableCell align="right">Avg Volume</TableCell>}
               <TableCell align="right">Volume Change</TableCell>
               <TableCell align="right">Amount</TableCell>
               {/* <TableCell align="right">High</TableCell>
@@ -77,11 +78,12 @@ const MarketDataTable = ({ data }) => {
             {filteredData.map((row) => (
               <TableRow key={row.key} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell component="th" scope="row">
-                  {row.symbol}
+                  <a href={`https://trade.fyers.in/popout/index.html?symbol=${row.symbol}`} target="_blank">{row.symbol}</a>
                 </TableCell>
                 <TableCell align="right">{row.ltp}</TableCell>
                 {/* <TableCell align="right">{row.bid_price}</TableCell>
               <TableCell align="right">{row.ask_price}</TableCell> */}
+                {isVolume && <TableCell align="right">{row.avg_volume}</TableCell>}
                 <TableCell align="right">{row.vol_change}</TableCell>
                 <TableCell align="right" style={{ fontWeight: "bold", color: row.amount > blurAmountValue ? "lightgreen" : "red" }}>
                   {row.formatted_amount}

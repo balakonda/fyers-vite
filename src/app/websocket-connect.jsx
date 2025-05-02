@@ -52,6 +52,17 @@ export default function WebSocketConnection() {
     console.log(result.message);
   };
 
+  const getAllHistory = async () => {
+    const response = await fetch("http://localhost:5000/api/get-all-history");
+    const result = await response.json();
+    console.log(result);
+    if(result.data){
+      localStorage.setItem("allHistory", JSON.stringify(result.data));
+    }
+  };
+
+
+
   useEffect(() => {
     // Test connection when component mounts
     testConnection();
@@ -78,6 +89,7 @@ export default function WebSocketConnection() {
         <Button onClick={testConnection}>Test Connection</Button>
         <Button onClick={disconnectWebSocket}>Disconnect WebSocket</Button>
         <Button onClick={getHistory}>Get History</Button>
+        <Button onClick={getAllHistory}>Get All History</Button>
       </ButtonGroup>
       <Typography
         variant="body1"

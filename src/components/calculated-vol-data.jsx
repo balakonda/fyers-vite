@@ -89,11 +89,12 @@ const headCells = [
   { id: "symbol", numeric: false, disablePadding: true, label: "Symbol" },
   { id: "ltp", numeric: true, disablePadding: false, label: "LTP" },
   { id: "vol_change", numeric: true, disablePadding: false, label: "Volume Change" },
+  { id: "avg_volume", numeric: true, disablePadding: false, label: "Avg Volume" },
   { id: "amount", numeric: true, disablePadding: false, label: "Amount" },
   { id: "last_traded_time", numeric: false, disablePadding: false, label: "Last Traded Time" },
 ];
 
-const TableData = ({ data }) => {
+const TableData = ({ data, isVolume = false }) => {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("symbol");
   const [rowsPerPage, setRowsPerPage] = React.useState(20);
@@ -123,7 +124,7 @@ const TableData = ({ data }) => {
 
   if (!data) return null;
   return (
-    <Paper direction="column" spacing={2} alignItems="center">
+    <Paper direction="column" spacing={2} >
       {/* <Filters handleBlurAmountChange={handleBlurAmountChange} isAmountChecked={isAmountChecked} handleAmountChecked={handleAmountChecked} /> */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="market data table" stickyHeader>
@@ -139,6 +140,7 @@ const TableData = ({ data }) => {
               <TableCell align="right">{row.ask_price}</TableCell> */}
                 <TableCell align="right">{row.vol_change}</TableCell>
                 <TableCell align="right">{row.formatted_amount}</TableCell>
+                {isVolume && <TableCell align="right">{row.avg_volume}</TableCell>}
                 {/* <TableCell align="right">{row.high_price}</TableCell>
               <TableCell align="right">{row.low_price}</TableCell> */}
                 {/* <TableCell align="right">{row.change_percentage}%</TableCell> */}
@@ -161,7 +163,7 @@ const TableData = ({ data }) => {
   );
 };
 
-const CalculatedData = () => {
+const CalculatedVolData = ({ volSwitchValue }) => {
   const [blurAmountValue, setBlurAmountValue] = useState(40000000);
   const [marketData, setMarketData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -209,9 +211,9 @@ const CalculatedData = () => {
   //   }, [data, isAmountChecked, blurAmountValue]);
 
   const fetchData1 = async () => {
-    if (!blurAmountValue) return;
+    if(!volSwitchValue) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/get-by-amount?amount=${blurAmountValue}`);
+      const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}`);
       const data = await response.json();
       setMarketData(data?.data);
       setIsLoading(false);
@@ -224,9 +226,9 @@ const CalculatedData = () => {
   // Call fetchData on mount and every 60 seconds
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        if (!blurAmountValue) return;
-        const response = await fetch(`http://localhost:5000/api/get-by-amount?amount=${blurAmountValue}`);
+      try { 
+        if (!volSwitchValue) return;
+        const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}`);
         console.log(response);
         if (!response.ok) {
           throw new Error("Failed to fetch market data");
@@ -244,18 +246,18 @@ const CalculatedData = () => {
       fetchData();
     }, 60000);
     return () => clearInterval(interval);
-  }, [blurAmountValue]);
+  }, [volSwitchValue]);
 
   return (
     <Card variant="outlined">
       <CardContent>
         <Stack direction="column" spacing={2} alignItems="center">
-          <Filters blurAmountValue={blurAmountValue} handleAmountChange={handleAmountChange} fetchData={fetchData1} />
-          <TableData data={filteredData} />
+          {/* <Filters blurAmountValue={blurAmountValue} handleAmountChange={handleAmountChange} fetchData={fetchData1} /> */}
+          <TableData data={filteredData} isVolume={true} />
         </Stack>
       </CardContent>
     </Card>
   );
 };
 
-export default CalculatedData;
+export default CalculatedVolData;

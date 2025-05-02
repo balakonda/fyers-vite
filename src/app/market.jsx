@@ -21,15 +21,21 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import CalculatedData from "../components/calculated-data";
 import Box from "@mui/material/Box";
 import BottomNavigation from "@mui/material/BottomNavigation";
+import MarketVolData from "../components/all-market-vol-data";
+import CalculatedVolData from "../components/calculated-vol-data";
+import Input from "@mui/material/Input";
 
 const STOCK_LIST = NIFTY_200_LIST.slice(0, 10).map((symbol) => `NSE:${symbol}-EQ`);
 
 export default function Market() {
   const [showAllMarketData, setShowAllMarketData] = useState(false);
+  const [showVolMarketData, setShowVolMarketData] = useState(false);
   const [showCalculatedData, setShowCalculatedData] = useState(false);
   const [showSelectedMarketData, setShowSelectedMarketData] = useState(false);
+  const [showCalculatedVolData, setShowCalculatedVolData] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [switchValue, setSwitchValue] = useState(30);
+  const [volSwitchValue, setVolSwitchValue] = useState(1);
   const [amount, setAmount] = useState(30000000);
   const [value, setValue] = useState(0);
 
@@ -60,6 +66,15 @@ export default function Market() {
     const result = await response.json();
     console.log(result);
   };
+  const handleShowVolMarketData = () => {
+    setShowVolMarketData(!showVolMarketData);
+  };
+  const handleVolSwitchChange = (event) => {
+    setVolSwitchValue(Number(event.target.value));
+  };
+  const handleShowCalculatedVolData = () => {
+    setShowCalculatedVolData(!showCalculatedVolData);
+  };
   // Calculate amount for 10000000 every 60 seconds
   useEffect(() => {
     const handleCalculateAmount = async () => {
@@ -83,7 +98,7 @@ export default function Market() {
           <Typography variant="p">Market Data</Typography>
         </AccordionSummary>
         <AccordionDetails>
-<Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} alignItems="center">
             {/* <Stack direction="row" spacing={2} alignItems="center">
               <Button onClick={() => setShowSelectedMarketData(!showSelectedMarketData)}>Show Selected Market Data</Button>
               <Select size="sm" multiple labelId="demo-simple-select-label" id="demo-simple-select" value={selectedSymbols} label="Age" onChange={handleChange}>
@@ -95,7 +110,7 @@ export default function Market() {
               </Select>
             </Stack> */}
             <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button onClick={getAllMarketData}>Get All Market Data</Button>
+              <Button onClick={handleShowVolMarketData}>{showVolMarketData ? "Hide Vol Market Data" : "Show Vol Market Data"}</Button>
               <Button onClick={handleShowAllMarketData}>{showAllMarketData ? "Hide All Market Data" : "Show All Market Data"}</Button>
             </ButtonGroup>
             <RadioGroup defaultValue="30" name="radio-buttons-group">
@@ -111,7 +126,10 @@ export default function Market() {
                 {/* <Input placeholder="Amount" type="number" value={amount} onChange={handleAmountChange} /> */}
               </Stack>
             </RadioGroup>
-            <Card>
+            <Input type="number" value={volSwitchValue} onChange={handleVolSwitchChange} />
+            <Button variant="outlined" onClick={handleShowCalculatedData}>{showCalculatedData ? "Hide Calculated Data" : "Show Calculated Data"}</Button>
+            <Button variant="outlined" onClick={handleShowCalculatedVolData}>{showCalculatedVolData ? "Hide Calculated Vol Data" : "Show Calculated Vol Data"}</Button>
+            {/* <Card>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
                   <Select value={amount} onChange={handleAmountChange}>
@@ -122,18 +140,20 @@ export default function Market() {
                     ))}
                   </Select>
                   <Button onClick={handleCalculateAmount1}>{"Calculate Amount"}</Button>
-                  <Button onClick={handleShowCalculatedData}>{"Show Calculated Data"}</Button>
-                  {/* <Typography variant="p">{formatNumber(amount)}</Typography> */}
+                  
+                  <Typography variant="p">{formatNumber(amount)}</Typography>
                 </Stack>
               </CardContent>
-            </Card>
+            </Card> */}
               </Stack>
         </AccordionDetails>
         </Accordion>
-      <Stack direction="row" spacing={2} >
+      <Stack direction="row" spacing={2}  flexWrap="wrap">
+        {showVolMarketData && <MarketVolData switchValue={switchValue} volSwitchValue={volSwitchValue} />}
         {showAllMarketData && <Market30Data switchValue={switchValue} />}
         {/* {showSelectedMarketData && <SelectedMarket30Data selectedSymbols={selectedSymbols} />} */}
           {showCalculatedData && <CalculatedData />}
+          {showCalculatedVolData && <CalculatedVolData volSwitchValue={volSwitchValue}/>}
       </Stack>
       {/* {showAllMarketData && <AllMarketData />} */}
       {/* {showSelectedMarketData && <SelectedMarketData selectedSymbols={selectedSymbols} />} */}

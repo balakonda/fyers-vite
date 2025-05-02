@@ -11,12 +11,37 @@ const isJSON = (data) => {
     return false;
   }
 };
+// get current day DD
+const currentDay = new Date().getDate();
+console.log('currentDay', currentDay);
 
-export const formatMarketData = (marketData, switchValue) => {
+const getVolumeKey = (symbol) => {
+  return `history:${currentDay}:${symbol}`;
+}
+
+const getVolumeData = (volData, symbol) => {
+  return volData[getVolumeKey(symbol)];
+}
+
+
+const checkVolChange = (volData, item, volSwitchValue = 1) => {
+  const volChange = getVolumeData(volData, item.symbol);
+  // console.log('volChange', volChange);
+  if(volChange && volChange.avgVolume && volChange.avgVolume > 0 && (volChange.avgVolume * volSwitchValue) < (item.vol_change)){
+    return volChange;
+  } else {
+    // console.log("No vol change for", item.symbol);
+    return false;
+  }
+}
+
+export const formatVolMarketData = (marketData, volData, switchValue, volSwitchValue) => {
+  console.log('volData', volData, volSwitchValue, switchValue);
   // check if marketData.message is an object
-  if (!marketData) {
+  if (!marketData || !volData) {
     return [];
   }
+
   // console.log("formatMarketData", marketData);
   const keys = Object.keys(marketData);
   const formattedData = keys.map((key) => {
@@ -43,11 +68,13 @@ export const formatMarketData = (marketData, switchValue) => {
       if (currentData && previousData) {
         const volChange = currentData.vol_traded_today - previousData.vol_traded_today;
         const amount = Math.round(volChange * currentData.ltp);
+        const volChangeData = getVolumeData(volData, currentData.symbol);
         return {
           key: currentData.symbol,
           symbol: currentData.symbol,
           ltp: currentData.ltp,
           vol_change: volChange,
+          avg_volume: volChangeData?.avgVolume,
           amount: amount,
           formatted_amount: formatNumber(amount),
           last_traded_time: currentData.last_traded_time ? new Date(currentData.last_traded_time * 1000).toLocaleString() : "",
@@ -68,28 +95,33 @@ export const formatMarketData = (marketData, switchValue) => {
       spreadData.push(item);
     }
   });
-  return spreadData.filter((item) => !!item).sort((a, b) => b.last_traded_time - a.last_traded_time) || [];
+  return spreadData.filter((item) => !!item && checkVolChange(volData, item, volSwitchValue) ).sort((a, b) => b.last_traded_time - a.last_traded_time) || [];
 };
 
-const Market30Data = ({ switchValue }) => {
+const MarketVolData = ({ switchValue, volSwitchValue }) => {
   const [marketData, setMarketData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [volData, setVolData] = useState(null);
+
+  
 
   useEffect(() => {
     const fetchMarketData = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/get-all-market-30-data");
-        if (!response.ok) {
-          throw new Error("Failed to fetch market data");
+      
+        try {
+          const response = await fetch("http://localhost:5000/api/get-all-market-30-data");
+          if (!response.ok) {
+            throw new Error("Failed to fetch market data");
+          }
+          const data = await response.json();
+          setMarketData(data?.data);
+          setIsLoading(false);
+        } catch (err) {
+          setError(err.message);
+          setIsLoading(false);
         }
-        const data = await response.json();
-        setMarketData(data?.data);
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
-      }
+      
     };
 
     // Initial fetch
@@ -104,6 +136,17 @@ const Market30Data = ({ switchValue }) => {
     return () => clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    const allHistory = localStorage.getItem("allHistory");
+    const allHistoryData = JSON.parse(allHistory);
+    console.log('allHistoryData', allHistoryData);
+    setVolData(allHistoryData);
+  }, []);
+
+  if (!volData) {
+    return <div>History not found...</div>;
+  }
+
   if (isLoading) {
     return <div>Loading market data...</div>;
   }
@@ -114,16 +157,16 @@ const Market30Data = ({ switchValue }) => {
 
   // Get Keys from marketData.message
   const formatData = () => {
-    const formattedData = formatMarketData(marketData, switchValue);
+    const formattedData = formatVolMarketData(marketData, volData, switchValue, volSwitchValue);
     return formattedData;
   };
 
   return (
     <Box className="market-data-container">
-      <h4>All Stocks Market Data</h4>
-      <MarketDataTable data={formatData()} />
+      <h4>Vol based Market Data</h4>
+      <MarketDataTable data={formatData()} isVolume={true} />
     </Box>
   );
 };
 
-export default Market30Data;
+export default MarketVolData;
