@@ -139,8 +139,9 @@ const TableData = ({ data, isVolume = false }) => {
                 {/* <TableCell align="right">{row.bid_price}</TableCell>
               <TableCell align="right">{row.ask_price}</TableCell> */}
                 <TableCell align="right">{row.vol_change}</TableCell>
-                <TableCell align="right">{row.formatted_amount}</TableCell>
+                
                 {isVolume && <TableCell align="right">{row.avg_volume}</TableCell>}
+                <TableCell align="right">{row.formatted_amount}</TableCell>
                 {/* <TableCell align="right">{row.high_price}</TableCell>
               <TableCell align="right">{row.low_price}</TableCell> */}
                 {/* <TableCell align="right">{row.change_percentage}%</TableCell> */}
@@ -186,6 +187,7 @@ const CalculatedVolData = ({ volSwitchValue }) => {
           symbol: obj.symbol,
           ltp: obj.ltp,
           vol_change: obj.volChange,
+          avg_volume: obj.avgVolume,
           amount: obj.amount,
           formatted_amount: formatNumber(obj.amount),
           last_traded_time: new Date(obj.last_traded_time * 1000).toLocaleString(),
