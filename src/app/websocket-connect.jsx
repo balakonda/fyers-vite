@@ -7,9 +7,11 @@ import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Stack from "@mui/material/Stack";
+import Input from "@mui/material/Input";
 
 export default function WebSocketConnection() {
   const [connectionStatus, setConnectionStatus] = useState(false);
+  const [volDays, setVolDays] = useState(10);
 
   const connectToWebSocket = async () => {
     const newAccessToken = localStorage.getItem("access_token");
@@ -47,9 +49,12 @@ export default function WebSocketConnection() {
   };
 
   const getHistory = async () => {
-    const response = await fetch("http://localhost:5000/api/get-history");
+    const response = await fetch(`http://localhost:5000/api/get-history?days=${volDays}`);
     const result = await response.json();
     console.log(result.message);
+    if(result.data){
+      localStorage.setItem("history", JSON.stringify(result.data));
+    }
   };
 
   const getAllHistory = async () => {
@@ -61,7 +66,20 @@ export default function WebSocketConnection() {
     }
   };
 
+  // /get-volume-file-history
+  const getVolumeFileHistory = async () => {
+    const response = await fetch("http://localhost:5000/api/get-volume-file-history");
+    const result = await response.json();
+    console.log(result);
+    if(result.data){
+      localStorage.setItem("volumeFileHistory", JSON.stringify(result.data));
+    }
+  };
 
+  const handleVolDaysChange = (event) => {
+    setVolDays(event.target.value);
+    localStorage.setItem("volDays", event.target.value);
+  };
 
   useEffect(() => {
     // Test connection when component mounts
@@ -90,6 +108,8 @@ export default function WebSocketConnection() {
         <Button onClick={disconnectWebSocket}>Disconnect WebSocket</Button>
         <Button onClick={getHistory}>Get History</Button>
         <Button onClick={getAllHistory}>Get All History</Button>
+        <Button onClick={getVolumeFileHistory}>Get Volume File History</Button>
+        <Input type="number" value={volDays} onChange={handleVolDaysChange} />
       </ButtonGroup>
       <Typography
         variant="body1"

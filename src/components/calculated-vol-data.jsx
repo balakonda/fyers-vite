@@ -215,7 +215,7 @@ const CalculatedVolData = ({ volSwitchValue }) => {
   const fetchData1 = async () => {
     if(!volSwitchValue) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}`);
+      const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}&days=${volDays}`);
       const data = await response.json();
       setMarketData(data?.data);
       setIsLoading(false);
@@ -230,7 +230,8 @@ const CalculatedVolData = ({ volSwitchValue }) => {
     const fetchData = async () => {
       try { 
         if (!volSwitchValue) return;
-        const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}`);
+        const volDays = localStorage.getItem("volDays") || 10;
+        const response = await fetch(`http://localhost:5000/api/get-by-vol?vol=${volSwitchValue}&days=${volDays}`);
         console.log(response);
         if (!response.ok) {
           throw new Error("Failed to fetch market data");

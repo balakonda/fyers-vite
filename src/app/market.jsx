@@ -35,7 +35,7 @@ export default function Market() {
   const [showCalculatedVolData, setShowCalculatedVolData] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [switchValue, setSwitchValue] = useState(30);
-  const [volSwitchValue, setVolSwitchValue] = useState(1);
+  const [volSwitchValue, setVolSwitchValue] = useState(10);
   const [amount, setAmount] = useState(30000000);
   const [value, setValue] = useState(0);
 
@@ -78,7 +78,8 @@ export default function Market() {
   // Calculate amount for 10000000 every 60 seconds
   useEffect(() => {
     const handleCalculateAmount = async () => {
-      const response = await fetch("http://localhost:5000/api/calculate-by-amount?amount=10000000");
+      const days = localStorage.getItem("volDays") || 10;
+      const response = await fetch(`http://localhost:5000/api/calculate-by-amount?amount=10000000&days=${days}`);
       const result = await response.json();
       console.log(result);
     };
