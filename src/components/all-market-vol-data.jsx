@@ -80,7 +80,7 @@ export const formatVolMarketData = (marketData, volData, switchValue, volSwitchV
           avg_volume: volChangeData?.avgVolume,
           amount: amount,
           formatted_amount: formatNumber(amount),
-          last_traded_time: currentData.last_traded_time ? new Date(currentData.last_traded_time * 1000).toLocaleString() : '',
+          last_traded_time: currentData.last_traded_time ? new Date(currentData.last_traded_time * 1000).toLocaleTimeString() : '',
         }
       }
     }

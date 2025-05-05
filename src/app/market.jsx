@@ -23,11 +23,13 @@ import BottomNavigation from '@mui/material/BottomNavigation'
 import MarketVolData from '../components/all-market-vol-data'
 import CalculatedVolData from '../components/calculated-vol-data'
 import Input from '@mui/material/Input'
+import AvgVolumeHistory from '../components/avg-volume-history'
 
 const STOCK_LIST = NIFTY_200_LIST.slice(0, 10).map(symbol => `NSE:${symbol}-EQ`)
 
 export default function Market() {
   const [showAllMarketData, setShowAllMarketData] = useState(false)
+  const [showAvgVolumeHistory, setShowAvgVolumeHistory] = useState(false)
   const [showVolMarketData, setShowVolMarketData] = useState(false)
   const [showCalculatedData, setShowCalculatedData] = useState(false)
   const [showSelectedMarketData, setShowSelectedMarketData] = useState(false)
@@ -73,6 +75,9 @@ export default function Market() {
   }
   const handleShowCalculatedVolData = () => {
     setShowCalculatedVolData(!showCalculatedVolData)
+  }
+  const handleShowAvgVolumeHistory = () => {
+    setShowAvgVolumeHistory(!showAvgVolumeHistory)
   }
   // Calculate amount for 10000000 every 60 seconds
   useEffect(() => {
@@ -135,6 +140,9 @@ export default function Market() {
             <Button variant="outlined" color={showCalculatedVolData ? 'secondary' : 'primary'} onClick={handleShowCalculatedVolData}>
               {showCalculatedVolData ? 'Hide Vol History' : 'Show Vol History'}
             </Button>
+            <Button variant="outlined" color={showAvgVolumeHistory ? 'secondary' : 'primary'} onClick={handleShowAvgVolumeHistory}>
+              {showAvgVolumeHistory ? 'Hide Avg Volume History' : 'Show Avg Volume History'}
+            </Button>
             {/* <Card>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -162,6 +170,9 @@ export default function Market() {
       <Stack direction="row" spacing={2}>
         {showCalculatedData && <CalculatedData />}
         {showCalculatedVolData && <CalculatedVolData volSwitchValue={volSwitchValue} />}
+      </Stack>
+      <Stack direction="row" spacing={2}>
+        {showAvgVolumeHistory && <AvgVolumeHistory />}
       </Stack>
       {/* {showAllMarketData && <AllMarketData />} */}
       {/* {showSelectedMarketData && <SelectedMarketData selectedSymbols={selectedSymbols} />} */}

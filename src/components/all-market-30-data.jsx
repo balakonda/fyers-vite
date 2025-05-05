@@ -53,7 +53,7 @@ export const formatMarketData = (marketData, switchValue) => {
           vol_change: volChange,
           amount: amount,
           formatted_amount: formatNumber(amount),
-          last_traded_time: currentData.last_traded_time ? new Date(currentData.last_traded_time * 1000).toLocaleString() : '',
+          last_traded_time: currentData.last_traded_time ? new Date(currentData.last_traded_time * 1000).toLocaleTimeString() : '',
         }
       }
     }

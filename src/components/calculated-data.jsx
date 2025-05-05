@@ -200,7 +200,7 @@ const CalculatedData = () => {
           vol_change: obj.volChange,
           amount: obj.amount,
           formatted_amount: formatNumber(obj.amount),
-          last_traded_time: new Date(obj.last_traded_time * 1000).toLocaleString(),
+          last_traded_time: new Date(obj.last_traded_time * 1000).toLocaleTimeString(),
           last_traded_time_epoch: obj.last_traded_time,
         })
       }
