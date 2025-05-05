@@ -33,7 +33,7 @@ export default function Market() {
   const [showSelectedMarketData, setShowSelectedMarketData] = useState(false)
   const [showCalculatedVolData, setShowCalculatedVolData] = useState(false)
   const [selectedSymbols, setSelectedSymbols] = useState([])
-  const [switchValue, setSwitchValue] = useState(30)
+  const [switchValue, setSwitchValue] = useState(60)
   const [volSwitchValue, setVolSwitchValue] = useState(10)
   const [amount, setAmount] = useState(30000000)
   const [value, setValue] = useState(0)
@@ -108,8 +108,12 @@ export default function Market() {
               </Select>
             </Stack> */}
             <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button onClick={handleShowVolMarketData}>{showVolMarketData ? 'Hide Vol Market Data' : 'Show Vol Market Data'}</Button>
-              <Button onClick={handleShowAllMarketData}>{showAllMarketData ? 'Hide All Market Data' : 'Show All Market Data'}</Button>
+              <Button color={showAllMarketData ? 'secondary' : 'primary'} onClick={handleShowAllMarketData}>
+                {showAllMarketData ? 'Hide Live Price' : 'Show Live Price'}
+              </Button>
+              <Button color={showVolMarketData ? 'secondary' : 'primary'} onClick={handleShowVolMarketData}>
+                {showVolMarketData ? 'Hide Live Vol' : 'Show Live Vol'}
+              </Button>
             </ButtonGroup>
             <RadioGroup defaultValue="30" name="radio-buttons-group">
               <Stack direction="row" spacing={2} alignItems="center">
@@ -125,11 +129,11 @@ export default function Market() {
               </Stack>
             </RadioGroup>
             <Input type="number" value={volSwitchValue} onChange={handleVolSwitchChange} />
-            <Button variant="outlined" onClick={handleShowCalculatedData}>
-              {showCalculatedData ? 'Hide Calculated Data' : 'Show Calculated Data'}
+            <Button variant="outlined" color={showCalculatedData ? 'secondary' : 'primary'} onClick={handleShowCalculatedData}>
+              {showCalculatedData ? 'Hide Price History' : 'Show Price History'}
             </Button>
-            <Button variant="outlined" onClick={handleShowCalculatedVolData}>
-              {showCalculatedVolData ? 'Hide Calculated Vol Data' : 'Show Calculated Vol Data'}
+            <Button variant="outlined" color={showCalculatedVolData ? 'secondary' : 'primary'} onClick={handleShowCalculatedVolData}>
+              {showCalculatedVolData ? 'Hide Vol History' : 'Show Vol History'}
             </Button>
             {/* <Card>
               <CardContent>
@@ -150,10 +154,12 @@ export default function Market() {
           </Stack>
         </AccordionDetails>
       </Accordion>
-      <Stack direction="row" spacing={2} flexWrap="wrap">
-        {showVolMarketData && <MarketVolData switchValue={switchValue} volSwitchValue={volSwitchValue} />}
+      <Stack direction="row" spacing={2}>
         {showAllMarketData && <Market30Data switchValue={switchValue} />}
+        {showVolMarketData && <MarketVolData switchValue={switchValue} volSwitchValue={volSwitchValue} />}
         {/* {showSelectedMarketData && <SelectedMarket30Data selectedSymbols={selectedSymbols} />} */}
+      </Stack>
+      <Stack direction="row" spacing={2}>
         {showCalculatedData && <CalculatedData />}
         {showCalculatedVolData && <CalculatedVolData volSwitchValue={volSwitchValue} />}
       </Stack>
