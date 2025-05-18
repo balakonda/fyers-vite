@@ -22,7 +22,15 @@ import { formatNumber, formatNumberInUSD } from '../../utils/numbers'
 const usdttoinr = 85
 
 const candlestickColumns = [
-  { field: 'symbol', headerName: 'Symbol' },
+  {
+    field: 'symbol',
+    headerName: 'Symbol',
+    renderCell: params => (
+      <a href={`https://www.binance.com/en/futures/${params.row.symbol}`} target="_blank">
+        {params.row.symbol}
+      </a>
+    ),
+  },
   {
     field: 'close',
     headerName: 'Close Price',
