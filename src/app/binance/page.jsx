@@ -1,5 +1,26 @@
-import { Box, Typography, Button, ButtonGroup, Divider, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Button,
+  ButtonGroup,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Table,
+  TableContainer,
+  Paper,
+} from '@mui/material'
 import { useState, useEffect } from 'react'
+import { DataGrid } from '@mui/x-data-grid'
+
+const candlestickColumns = [
+  { field: 'symbol', headerName: 'Symbol' },
+  { field: 'open', headerName: 'Open' },
+  { field: 'high', headerName: 'High' },
+  { field: 'low', headerName: 'Low' },
+  { field: 'close', headerName: 'Close' },
+]
 
 export default function Binance() {
   const [connectionStatus, setConnectionStatus] = useState(false)
@@ -11,6 +32,7 @@ export default function Binance() {
   const [testConnection, setTestConnection] = useState(false)
   const [accountInfo, setAccountInfo] = useState([])
   const [showAccountInfo, setShowAccountInfo] = useState(false)
+  const [candlesticks, setCandlesticks] = useState([])
 
   const disconnect = () => {
     setConnectionStatus(false)
@@ -72,6 +94,17 @@ export default function Binance() {
     console.log(accountInfo)
   }
 
+  // /get-binance-candlesticks
+  const getCandlesticks = async () => {
+    const response = await fetch('http://localhost:5000/api/get-binance-candlesticks')
+    const result = await response.json()
+    if (result.status === 200) {
+      setCandlesticks(result.response)
+    } else {
+      setCandlesticks([])
+    }
+  }
+
   useEffect(() => {
     // Check test connection every 30secs
     const interval = setInterval(() => {
@@ -101,6 +134,7 @@ export default function Binance() {
               <Button onClick={startTracking}>Start Tracking</Button>
               <Button onClick={getAccountInfo}>Account Info</Button>
               <Button onClick={handleShowAccountInfo}>{showAccountInfo ? 'Hide Account Info' : 'Show Account Info'}</Button>
+              <Button onClick={getCandlesticks}>Get Candlesticks</Button>
             </ButtonGroup>
           </Box>
         </AccordionDetails>
@@ -109,6 +143,19 @@ export default function Binance() {
         <Box>
           <Typography>Account Info</Typography>
           <Typography sx={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(accountInfo, null, 2)}</Typography>
+        </Box>
+      )}
+      {candlesticks.length > 0 && (
+        <Box>
+          <Typography>Last 5 minutes of candlesticks</Typography>
+          <DataGrid
+            className="candlestick-table"
+            getRowId={row => row.symbol + row.eventTime}
+            columns={candlestickColumns}
+            pageSizeOptions={[5, 10]}
+            rows={candlesticks}
+            aria-label="simple table"
+          ></DataGrid>
         </Box>
       )}
       {/* <Accordion>
