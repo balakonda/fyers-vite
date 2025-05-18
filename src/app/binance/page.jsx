@@ -15,7 +15,7 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { formatNumber, formatNumberInUSD } from '../../utils/numbers'
 
@@ -33,9 +33,10 @@ const candlestickColumns = [
   },
   {
     field: 'close',
+    width: 200,
     headerName: 'Close Price',
     valueGetter: value => {
-      return Math.round(value)
+      return `${formatNumberInUSD(value)} - ${formatNumber(Math.round(value * usdttoinr))}`
     },
   },
   {
@@ -197,9 +198,9 @@ export default function Binance() {
     return () => clearInterval(interval)
   }, [])
 
-  const getCandlesticksBySymbol = () => {
+  const getCandlesticksBySymbol = useMemo(() => {
     return symbolFilter ? candlesticks.filter(candlestick => candlestick.symbol.includes(symbolFilter)) : candlesticks
-  }
+  }, [symbolFilter, candlesticks])
 
   return (
     <Box sx={{ p: 2 }}>
@@ -268,7 +269,7 @@ export default function Binance() {
             getRowId={row => row.symbol + row.startTime}
             columns={candlestickColumns}
             pageSizeOptions={[5, 10]}
-            rows={getCandlesticksBySymbol()}
+            rows={getCandlesticksBySymbol}
             aria-label="simple table"
             disableColumnFilter
             disableColumnSelector
