@@ -148,6 +148,13 @@ export default function Binance() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getCandlesticks()
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   const getCandlesticksBySymbol = () => {
     return symbolFilter ? candlesticks.filter(candlestick => candlestick.symbol.includes(symbolFilter)) : candlesticks
   }
