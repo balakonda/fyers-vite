@@ -11,16 +11,21 @@ import {
   TableContainer,
   Paper,
   InputLabel,
+  Select,
+  MenuItem,
   TextField,
 } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
+import { formatNumber, formatNumberInUSD } from '../../utils/numbers'
+
+const usdttoinr = 85
 
 const candlestickColumns = [
   { field: 'symbol', headerName: 'Symbol' },
   {
-    field: 'open',
-    headerName: 'Open',
+    field: 'close',
+    headerName: 'Close Price',
     valueGetter: value => {
       return Math.round(value)
     },
@@ -33,28 +38,39 @@ const candlestickColumns = [
     },
   },
   {
-    field: 'eventTime',
+    field: 'amount',
+    headerName: 'USDT Amount',
     width: 170,
-    headerName: 'Event Time',
+    valueGetter: value => {
+      return formatNumberInUSD(Math.round(value))
+    },
+  },
+  {
+    field: 'price',
+    headerName: 'INR Price',
+    width: 200,
+    valueGetter: (value, row) => {
+      return formatNumber(Math.round(row.amount * usdttoinr))
+    },
+  },
+  {
+    field: 'startTime',
+    width: 170,
+    headerName: 'Start Time',
     valueGetter: (value, row) => {
       return new Date(value).toLocaleString()
     },
   },
-  {
-    field: 'close',
-    headerName: 'Close',
-    valueGetter: value => {
-      return Math.round(value)
-    },
-  },
-  {
-    field: 'buyVolume',
-    headerName: 'Buy Volume',
-    valueGetter: value => {
-      return parseFloat(value).toFixed(2)
-    },
-  },
 ]
+
+const onecr = 10000000
+const optionsFor20Crores = () => {
+  const options = []
+  for (let i = 1; i <= 20; i++) {
+    options.push({ value: i * onecr, label: `${i} Cr` })
+  }
+  return options
+}
 
 export default function Binance() {
   const [connectionStatus, setConnectionStatus] = useState(false)
@@ -68,6 +84,7 @@ export default function Binance() {
   const [showAccountInfo, setShowAccountInfo] = useState(false)
   const [candlesticks, setCandlesticks] = useState([])
   const [symbolFilter, setSymbolFilter] = useState('')
+  const [amountFilter, setAmountFilter] = useState(100000000)
 
   const disconnect = () => {
     setConnectionStatus(false)
@@ -140,6 +157,16 @@ export default function Binance() {
     }
   }
 
+  const getCandlesticksByAmount = async () => {
+    const response = await fetch(`http://localhost:5000/api/get-binance-candlesticks-by-amount?amount=${amountFilter}`)
+    const result = await response.json()
+    if (result.status === 200) {
+      setCandlesticks(result.response)
+    } else {
+      setCandlesticks([])
+    }
+  }
+
   useEffect(() => {
     // Check test connection every 30secs
     const interval = setInterval(() => {
@@ -148,9 +175,16 @@ export default function Binance() {
     return () => clearInterval(interval)
   }, [])
 
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     getCandlesticks()
+  //   }, 30000)
+  //   return () => clearInterval(interval)
+  // }, [])
+
   useEffect(() => {
     const interval = setInterval(() => {
-      getCandlesticks()
+      getCandlesticksByAmount()
     }, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -180,7 +214,7 @@ export default function Binance() {
               <Button onClick={startTracking}>Start Tracking</Button>
               <Button onClick={getAccountInfo}>Account Info</Button>
               <Button onClick={handleShowAccountInfo}>{showAccountInfo ? 'Hide Account Info' : 'Show Account Info'}</Button>
-              <Button onClick={getCandlesticks}>Get Candlesticks</Button>
+              <Button onClick={getCandlesticksByAmount}>Get Candlesticks</Button>
             </ButtonGroup>
           </Box>
         </AccordionDetails>
@@ -195,6 +229,22 @@ export default function Binance() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography>Last 5 minutes of candlesticks</Typography>
+            <Select
+              size="small"
+              id="outlined-basic"
+              label="Filter by Amount"
+              variant="outlined"
+              value={amountFilter}
+              onChange={e => {
+                setAmountFilter(e.target.value)
+              }}
+            >
+              {optionsFor20Crores().map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
             <TextField
               size="small"
               id="outlined-basic"
@@ -207,7 +257,7 @@ export default function Binance() {
           </Box>
           <DataGrid
             className="candlestick-table"
-            getRowId={row => row.symbol + row.eventTime}
+            getRowId={row => row.symbol + row.startTime}
             columns={candlestickColumns}
             pageSizeOptions={[5, 10]}
             rows={getCandlesticksBySymbol()}
