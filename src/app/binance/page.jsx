@@ -10,16 +10,50 @@ import {
   Table,
   TableContainer,
   Paper,
+  InputLabel,
+  TextField,
 } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 
 const candlestickColumns = [
   { field: 'symbol', headerName: 'Symbol' },
-  { field: 'open', headerName: 'Open' },
-  { field: 'high', headerName: 'High' },
-  { field: 'low', headerName: 'Low' },
-  { field: 'close', headerName: 'Close' },
+  {
+    field: 'open',
+    headerName: 'Open',
+    valueGetter: value => {
+      return Math.round(value)
+    },
+  },
+  {
+    field: 'volume',
+    headerName: 'Volume',
+    valueGetter: value => {
+      return parseFloat(value).toFixed(2)
+    },
+  },
+  {
+    field: 'eventTime',
+    width: 170,
+    headerName: 'Event Time',
+    valueGetter: (value, row) => {
+      return new Date(value).toLocaleString()
+    },
+  },
+  {
+    field: 'close',
+    headerName: 'Close',
+    valueGetter: value => {
+      return Math.round(value)
+    },
+  },
+  {
+    field: 'buyVolume',
+    headerName: 'Buy Volume',
+    valueGetter: value => {
+      return parseFloat(value).toFixed(2)
+    },
+  },
 ]
 
 export default function Binance() {
@@ -33,6 +67,7 @@ export default function Binance() {
   const [accountInfo, setAccountInfo] = useState([])
   const [showAccountInfo, setShowAccountInfo] = useState(false)
   const [candlesticks, setCandlesticks] = useState([])
+  const [symbolFilter, setSymbolFilter] = useState('')
 
   const disconnect = () => {
     setConnectionStatus(false)
@@ -113,6 +148,10 @@ export default function Binance() {
     return () => clearInterval(interval)
   }, [])
 
+  const getCandlesticksBySymbol = () => {
+    return symbolFilter ? candlesticks.filter(candlestick => candlestick.symbol.includes(symbolFilter)) : candlesticks
+  }
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h5">Binance</Typography>
@@ -146,15 +185,30 @@ export default function Binance() {
         </Box>
       )}
       {candlesticks.length > 0 && (
-        <Box>
-          <Typography>Last 5 minutes of candlesticks</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography>Last 5 minutes of candlesticks</Typography>
+            <TextField
+              size="small"
+              id="outlined-basic"
+              label="Filter by symbol"
+              variant="outlined"
+              onChange={e => {
+                setSymbolFilter(e.target.value)
+              }}
+            />
+          </Box>
           <DataGrid
             className="candlestick-table"
             getRowId={row => row.symbol + row.eventTime}
             columns={candlestickColumns}
             pageSizeOptions={[5, 10]}
-            rows={candlesticks}
+            rows={getCandlesticksBySymbol()}
             aria-label="simple table"
+            disableColumnFilter
+            disableColumnSelector
+            disableDensitySelector
+            showToolbar
           ></DataGrid>
         </Box>
       )}
