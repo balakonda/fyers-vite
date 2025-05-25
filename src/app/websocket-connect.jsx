@@ -81,6 +81,29 @@ export default function WebSocketConnection() {
     localStorage.setItem('volDays', event.target.value)
   }
 
+  const handleNewFyers = async () => {
+    // newinit
+    const newAccessToken = localStorage.getItem('access_token')
+    const response = await fetch('http://localhost:5000/api/newinit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ accessToken: newAccessToken }),
+    })
+
+    const result = await response.json()
+
+    console.log(result)
+  }
+
+  const stopDummyStocks = async () => {
+    // /stop-dummy-stock-updates
+    const response = await fetch('http://localhost:5000/api/stop-dummy-stock-updates')
+    const result = await response.json()
+    console.log(result)
+  }
+
   useEffect(() => {
     // Test connection when component mounts
     testConnection()
@@ -103,6 +126,20 @@ export default function WebSocketConnection() {
           }}
         >
           Get Fyers WebSocket
+        </Button>
+        <Button
+          onClick={() => {
+            handleNewFyers()
+          }}
+        >
+          New Fyers
+        </Button>
+        <Button
+          onClick={() => {
+            stopDummyStocks()
+          }}
+        >
+          Stop Dummy Stocks
         </Button>
         <Button onClick={testConnection}>Test Connection</Button>
         <Button onClick={disconnectWebSocket}>Disconnect WebSocket</Button>

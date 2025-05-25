@@ -81,6 +81,14 @@ const optionsFor20Crores = () => {
   return options
 }
 
+// Add volume options helper
+const volumeOptions = () => {
+  return [5, 10, 15, 20].map(vol => ({
+    value: vol,
+    label: `${vol.toLocaleString()}X `,
+  }))
+}
+
 export default function Binance() {
   const [connectionStatus, setConnectionStatus] = useState(false)
   const [history, setHistory] = useState([])
@@ -94,6 +102,8 @@ export default function Binance() {
   const [candlesticks, setCandlesticks] = useState([])
   const [symbolFilter, setSymbolFilter] = useState('')
   const [amountFilter, setAmountFilter] = useState(100000000)
+  const [volumeFilter, setVolumeFilter] = useState(5) // Add volume filter state
+  const [filterType, setFilterType] = useState('amount') // Add this new state
 
   const disconnect = () => {
     setConnectionStatus(false)
@@ -167,12 +177,56 @@ export default function Binance() {
   }
 
   const getCandlesticksByAmount = async () => {
-    const response = await fetch(`http://localhost:5000/api/get-binance-candlesticks-by-amount?amount=${amountFilter}`)
-    const result = await response.json()
-    if (result.status === 200) {
-      setCandlesticks(result.response)
-    } else {
-      setCandlesticks([])
+    try {
+      const response = await fetch(`http://localhost:5000/api/get-binance-candlesticks-by-amount?amount=${amountFilter}`)
+      const result = await response.json()
+      if (result.status === 200) {
+        setCandlesticks(result.response)
+      } else {
+        setCandlesticks([])
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // Get CandleSticks by Volume
+  const getCandlesticksByVolume = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/get-binance-candlesticks-by-volume?volume=${volumeFilter}`)
+      const result = await response.json()
+      if (result.status === 200) {
+        setCandlesticks(result.response)
+      } else {
+        setCandlesticks([])
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // Add useEffect for volume filtering
+  useEffect(() => {
+    const fetchData = async () => {
+      if (filterType === 'amount') {
+        await getCandlesticksByAmount()
+      } else {
+        await getCandlesticksByVolume()
+      }
+    }
+
+    fetchData() // Initial fetch
+    const interval = setInterval(fetchData, 30000)
+    return () => clearInterval(interval)
+  }, [filterType, amountFilter, volumeFilter])
+
+  const generateAvg5DaysVolume = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/get-past-5-days-volume`)
+      const result = await response.json()
+      console.log(result)
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -190,13 +244,6 @@ export default function Binance() {
   //   }, 30000)
   //   return () => clearInterval(interval)
   // }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getCandlesticksByAmount()
-    }, 30000)
-    return () => clearInterval(interval)
-  }, [])
 
   const getCandlesticksBySymbol = useMemo(() => {
     return symbolFilter ? candlesticks.filter(candlestick => candlestick.symbol.includes(symbolFilter)) : candlesticks
@@ -223,7 +270,9 @@ export default function Binance() {
               <Button onClick={startTracking}>Start Tracking</Button>
               <Button onClick={getAccountInfo}>Account Info</Button>
               <Button onClick={handleShowAccountInfo}>{showAccountInfo ? 'Hide Account Info' : 'Show Account Info'}</Button>
-              <Button onClick={getCandlesticksByAmount}>Get Candlesticks</Button>
+              <Button onClick={generateAvg5DaysVolume}>Generate Avg. 5days Volume</Button>
+              <Button onClick={getCandlesticksBySymbol}>Get Candlesticks by Symbol</Button>
+              <Button onClick={getCandlesticksByVolume}>Get Candlesticks by Volume</Button>
             </ButtonGroup>
           </Box>
         </AccordionDetails>
@@ -234,19 +283,23 @@ export default function Binance() {
           <Typography sx={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(accountInfo, null, 2)}</Typography>
         </Box>
       )}
-      {candlesticks.length > 0 && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography>Last 5 minutes of candlesticks</Typography>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* <Typography>Last 5 minutes of candlesticks</Typography> */}
+
+          <Select size="small" label="Filter Type" variant="outlined" value={filterType} onChange={e => setFilterType(e.target.value)}>
+            <MenuItem value="amount">Filter by Amount</MenuItem>
+            <MenuItem value="volume">Filter by Volume</MenuItem>
+          </Select>
+
+          {filterType === 'amount' && (
             <Select
               size="small"
-              id="outlined-basic"
               label="Filter by Amount"
               variant="outlined"
               value={amountFilter}
-              onChange={e => {
-                setAmountFilter(e.target.value)
-              }}
+              onChange={e => setAmountFilter(e.target.value)}
             >
               {optionsFor20Crores().map(option => (
                 <MenuItem key={option.value} value={option.value}>
@@ -254,16 +307,27 @@ export default function Binance() {
                 </MenuItem>
               ))}
             </Select>
-            <TextField
+          )}
+
+          {filterType === 'volume' && (
+            <Select
               size="small"
-              id="outlined-basic"
-              label="Filter by symbol"
+              label="Filter by Volume"
               variant="outlined"
-              onChange={e => {
-                setSymbolFilter(e.target.value)
-              }}
-            />
-          </Box>
+              value={volumeFilter}
+              onChange={e => setVolumeFilter(e.target.value)}
+            >
+              {volumeOptions().map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+
+          <TextField size="small" label="Filter by symbol" variant="outlined" onChange={e => setSymbolFilter(e.target.value)} />
+        </Box>
+        {candlesticks.length > 0 && (
           <DataGrid
             className="candlestick-table"
             getRowId={row => row.symbol + row.startTime}
@@ -276,8 +340,9 @@ export default function Binance() {
             disableDensitySelector
             showToolbar
           ></DataGrid>
-        </Box>
-      )}
+        )}
+      </Box>
+
       {/* <Accordion>
               <AccordionSummary>
                   <Typography>Exchange Info</Typography>
